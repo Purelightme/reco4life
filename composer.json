@@ -1,0 +1,17 @@
+{
+    "name": "purelightme/reco4life",
+    "description": "http rest api wrapper for reco4life",
+    "type": "library",
+    "authors": [
+        {
+            "name": "帅纯亮",
+            "email": "shuaichunliang@hooook.com"
+        }
+    ],
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "Purelightme\\": "src/"
+        }
+    }
+}
