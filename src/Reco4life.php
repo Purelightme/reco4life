@@ -15,7 +15,7 @@ class Reco4life
     public $token = '';
     public $urlPrefix = 'http://api.reco4life.com/v/api.1.1/';
 
-    public function construct($userName, $apiKey)
+    public function __construct($userName, $apiKey)
     {
         $this->userName = $userName;
         $this->apiKey = $apiKey;
@@ -41,8 +41,9 @@ class Reco4life
         return json_decode($res,true);
     }
 
-    public function getToken()
+    public function getToken($isRefresh = false)
     {
+        if (!$isRefresh)
         $action = 'get_token';
         $ret =  $this->sendGetRequest($action, [
             'user_name' => $this->userName,
@@ -54,19 +55,29 @@ class Reco4life
         return $ret;
     }
 
-    public function itemList($params)
+    public function itemList($params,$refresh = false)
     {
         if (!$this->token)
-            $this->getToken();
+            $this->getToken($refresh);
         $action = 'item_list';
-        return $this->sendGetRequest($action, $params);
+        $res =  $this->sendGetRequest($action, $params);
+        if ($res['result'] == ErrorCode::RESULT_TOKEN_EXPIRED){
+            $this->token = '';
+            return $this->itemList($params,true);
+        }
+        return $res;
     }
 
-    public function itemSwitch($params)
+    public function itemSwitch($params,$refresh = false)
     {
         if (!$this->token)
-            $this->getToken();
+            $this->getToken($refresh);
         $action = 'item_switch';
-        return $this->sendGetRequest($action, $params);
+        $res =  $this->sendGetRequest($action, $params);
+        if ($res['result'] == ErrorCode::RESULT_TOKEN_EXPIRED){
+            $this->token = '';
+            return $this->itemSwitch($params,true);
+        }
+        return $res;
     }
 }
