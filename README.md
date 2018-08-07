@@ -1,4 +1,4 @@
-# 现在物联网智能插座方案reco4life,支持HttpAPI和局域网API
+# 现代物联网智能插座方案reco4life,支持HttpAPI和局域网API
 
 # steps
 ```
