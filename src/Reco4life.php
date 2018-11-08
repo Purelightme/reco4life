@@ -8,6 +8,9 @@
 
 namespace Purelightme;
 
+use GuzzleHttp\Client;
+use function GuzzleHttp\Promise\settle;
+
 class Reco4life
 {
     public $userName = '';
@@ -20,37 +23,37 @@ class Reco4life
         $this->apiKey = $apiKey;
     }
 
-    public function sendGetRequest($action,$params,$token = '')
+    public function sendGetRequest($action, $params, $token = '')
     {
         $params = http_build_query($params);
-        $ch = curl_init($this->urlPrefix . $action .'?'. $params);
-        if ($token){
+        $ch = curl_init($this->urlPrefix . $action . '?' . $params);
+        if ($token) {
             $headers = [
-                'token:'.$token
+                'token:' . $token
             ];
-            curl_setopt($ch,CURLOPT_HTTPHEADER,$headers);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
         }
-        curl_setopt($ch,CURLOPT_RETURNTRANSFER,1);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         $res = curl_exec($ch);
-        if (curl_errno($ch)){
+        if (curl_errno($ch)) {
             return [
                 'result' => curl_error($ch)
             ];
         }
-        return json_decode($res,true);
+        return json_decode($res, true);
     }
 
     public function getToken()
     {
         $action = 'get_token';
-        $ret =  $this->sendGetRequest($action, [
+        $ret = $this->sendGetRequest($action, [
             'user_name' => $this->userName,
             'api_key' => $this->apiKey
         ]);
         return $ret;
     }
 
-    public function itemList($params,$token)
+    public function itemList($params, $token)
     {
         $action = 'item_list';
         return $this->sendGetRequest($action, $params, $token);
@@ -60,5 +63,45 @@ class Reco4life
     {
         $action = 'item_switch';
         return $this->sendGetRequest($action, $params, $token);
+    }
+
+    public function batchItemSwitch(...$params)
+    {
+        $action = 'item_switch';
+        $client = new Client($this->urlPrefix);
+        $promises = [];
+        foreach ($params as $index => $param) {
+            foreach (explode(',', $param['sn']) as $sn) {
+                $promises[$index . '-' . $sn] = $client->getAsync($action, [
+                    'headers' => [
+                        'token' => $param['token']
+                    ],
+                    'query' => [
+                        'user_name' => $param['user_name'],
+                        'sn' => $sn,
+                        'status' => $param['status']
+                    ]
+                ]);
+            }
+        }
+        return settle($promises);
+    }
+
+    public function batchItemList(...$params)
+    {
+        $action = 'item_list';
+        $client = new Client($this->urlPrefix);
+        $promises = [];
+        foreach ($params as $index => $param) {
+            $promises[$index] = $client->getAsync($action, [
+                'headers' => [
+                    'token' => $param['token']
+                ],
+                'query' => [
+                    'user_name' => $param['user_name'],
+                ]
+            ]);
+        }
+        return settle($promises);
     }
 }
