@@ -68,7 +68,7 @@ class Reco4life
     public function batchItemSwitch(...$params)
     {
         $action = 'item_switch';
-        $client = new Client($this->urlPrefix);
+        $client = new Client(['base_uri' => $this->urlPrefix]);
         $promises = [];
         foreach ($params as $index => $param) {
             foreach (explode(',', $param['sn']) as $sn) {
@@ -90,7 +90,7 @@ class Reco4life
     public function batchItemList(...$params)
     {
         $action = 'item_list';
-        $client = new Client($this->urlPrefix);
+        $client = new Client(['base_uri' => $this->urlPrefix]);
         $promises = [];
         foreach ($params as $index => $param) {
             $promises[$index] = $client->getAsync($action, [
