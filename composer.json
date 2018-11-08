@@ -8,15 +8,19 @@
             "email": "shuaichunliang@hooook.com"
         }
     ],
-    "require": {},
+    "require": {
+        "guzzlehttp/guzzle": "^6.3@dev"
+    },
     "autoload": {
         "psr-4": {
             "Purelightme\\": "src/"
         }
     },
     "minimum-stability": "dev",
-    "packagist": {
-        "type": "composer",
-        "url": "https://packagist.phpcomposer.com"
+    "repositories": {
+        "packagist": {
+            "type": "composer",
+            "url": "https://packagist.laravel-china.org"
+        }
     }
 }
