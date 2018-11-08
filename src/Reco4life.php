@@ -9,7 +9,7 @@
 namespace Purelightme;
 
 use GuzzleHttp\Client;
-use function GuzzleHttp\Promise\settle;
+use function GuzzleHttp\Promise\unwrap;
 
 class Reco4life
 {
@@ -84,7 +84,12 @@ class Reco4life
                 ]);
             }
         }
-        return settle($promises);
+        $results = unwrap($promises);
+        $res = [];
+        foreach ($results as $index => $result){
+            $res[$index] = json_decode((string) $result->getBody(),true);
+        }
+        return $res;
     }
 
     public function batchItemList(...$params)
@@ -102,6 +107,11 @@ class Reco4life
                 ]
             ]);
         }
-        return settle($promises);
+        $results = unwrap($promises);
+        $res = [];
+        foreach ($results as $index => $result){
+            $res[$index] = json_decode((string) $result->getBody(),true);
+        }
+        return $res;
     }
 }
