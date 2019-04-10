@@ -9,6 +9,7 @@
 namespace Purelightme;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
 use function GuzzleHttp\Promise\unwrap;
 
 class Reco4life
@@ -23,24 +24,23 @@ class Reco4life
         $this->apiKey = $apiKey;
     }
 
-    public function sendGetRequest($action, $params, $token = '')
+    public function sendGetRequest($action, $params, $token = '', $timeout = 5)
     {
-        $params = http_build_query($params);
-        $ch = curl_init($this->urlPrefix . $action . '?' . $params);
-        if ($token) {
-            $headers = [
-                'token:' . $token
-            ];
-            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        $client = new Client([
+            'base_uri' => $this->urlPrefix,
+            'timeout' => $timeout
+        ]);
+        try {
+            $options = ['query' => $params];
+            if ($token)
+                $options['headers'] = ['token' => $token];
+            $response = $client->request('GET', $action, $options);
+            $res = json_decode((string)$response->getBody(),true);
+            $res['result_desc'] = ErrorCode::RESULT_MSG[$res['result']];
+        } catch (GuzzleException $e) {
+            $res['result_desc'] = '请求异常:'.$e->getMessage();
         }
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        $res = curl_exec($ch);
-        if (curl_errno($ch)) {
-            return [
-                'result' => curl_error($ch)
-            ];
-        }
-        return json_decode($res, true);
+        return $res;
     }
 
     public function getToken()
