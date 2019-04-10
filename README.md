@@ -1,6 +1,6 @@
 # 现代物联网智能插座方案reco4life,支持HttpAPI和局域网API
 
-# steps
+# usage
 ```
 composer require purelightme/reco4life -vvv
 ```
@@ -13,5 +13,8 @@ $token = $reco->getToken();
 $itemLists = $reco->itemList(['user_name' => YOUR_RECO_USER_NAME],$token['token']);
 var_dump($itemLists);
 ```
+
+# test
+```vendor/bin/phpunit tests```
 # todos
 - 局域网API(基于swoole)
