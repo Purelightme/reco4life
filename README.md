@@ -1,10 +1,11 @@
 Reco4life SDK
 ========
-[![Build Status](https://travis-ci.org/Heqiauto/hepc-sdk.svg)](https://travis-ci.org/Purelightme/reco4life.svg?branch=master)
+![Build Status](https://travis-ci.org/Purelightme/reco4life.svg?branch=master)
 
+
+现代物联网智能插座方案reco4life,支持HttpAPI和局域网API.
 
 Sdk client for Reco4life service.
-现代物联网智能插座方案reco4life,支持HttpAPI和局域网API.
 
 Installation
 ------------
