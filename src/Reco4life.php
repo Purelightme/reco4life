@@ -9,7 +9,8 @@
 namespace Purelightme;
 
 use GuzzleHttp\Client;
-use function GuzzleHttp\Promise\settle;
+use GuzzleHttp\Exception\GuzzleException;
+use function GuzzleHttp\Promise\unwrap;
 
 class Reco4life
 {
@@ -23,24 +24,23 @@ class Reco4life
         $this->apiKey = $apiKey;
     }
 
-    public function sendGetRequest($action, $params, $token = '')
+    public function sendGetRequest($action, $params, $token = '', $timeout = 5)
     {
-        $params = http_build_query($params);
-        $ch = curl_init($this->urlPrefix . $action . '?' . $params);
-        if ($token) {
-            $headers = [
-                'token:' . $token
-            ];
-            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        $client = new Client([
+            'base_uri' => $this->urlPrefix,
+            'timeout' => $timeout
+        ]);
+        try {
+            $options = ['query' => $params];
+            if ($token)
+                $options['headers'] = ['token' => $token];
+            $response = $client->request('GET', $action, $options);
+            $res = json_decode((string)$response->getBody(),true);
+            $res['result_desc'] = ErrorCode::RESULT_MSG[$res['result']];
+        } catch (GuzzleException $e) {
+            $res['result_desc'] = '请求异常:'.$e->getMessage();
         }
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        $res = curl_exec($ch);
-        if (curl_errno($ch)) {
-            return [
-                'result' => curl_error($ch)
-            ];
-        }
-        return json_decode($res, true);
+        return $res;
     }
 
     public function getToken()
@@ -68,7 +68,7 @@ class Reco4life
     public function batchItemSwitch(...$params)
     {
         $action = 'item_switch';
-        $client = new Client($this->urlPrefix);
+        $client = new Client(['base_uri' => $this->urlPrefix]);
         $promises = [];
         foreach ($params as $index => $param) {
             foreach (explode(',', $param['sn']) as $sn) {
@@ -84,13 +84,18 @@ class Reco4life
                 ]);
             }
         }
-        return settle($promises);
+        $results = unwrap($promises);
+        $res = [];
+        foreach ($results as $index => $result){
+            $res[$index] = json_decode((string) $result->getBody(),true);
+        }
+        return $res;
     }
 
     public function batchItemList(...$params)
     {
         $action = 'item_list';
-        $client = new Client($this->urlPrefix);
+        $client = new Client(['base_uri' => $this->urlPrefix]);
         $promises = [];
         foreach ($params as $index => $param) {
             $promises[$index] = $client->getAsync($action, [
@@ -102,6 +107,11 @@ class Reco4life
                 ]
             ]);
         }
-        return settle($promises);
+        $results = unwrap($promises);
+        $res = [];
+        foreach ($results as $index => $result){
+            $res[$index] = json_decode((string) $result->getBody(),true);
+        }
+        return $res;
     }
 }
