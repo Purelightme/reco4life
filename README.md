@@ -1,11 +1,25 @@
-# 现代物联网智能插座方案reco4life,支持HttpAPI和局域网API
+Reco4life SDK
+========
+[![Build Status](https://travis-ci.org/Heqiauto/hepc-sdk.svg)](https://travis-ci.org/Purelightme/reco4life.svg?branch=master)
 
-# usage
+
+Sdk client for Reco4life service.
+现代物联网智能插座方案reco4life,支持HttpAPI和局域网API.
+
+Installation
+------------
+It's recommended that you use [Composer](https://getcomposer.org/) to install this project.
+
+```bash
+composer require purelightme/reco4life
 ```
-composer require purelightme/reco4life -vvv
-```
-```
-<?php
+
+This will install the library and all required dependencies.
+
+Usage
+-----
+
+```php
 use Purelightme\Reco4life;
 
 $reco = new Reco4life(YOUR_RECO_USER_NAME,YOUR_RECO_API_KEY);
@@ -14,7 +28,12 @@ $itemLists = $reco->itemList(['user_name' => YOUR_RECO_USER_NAME],$token['token'
 var_dump($itemLists);
 ```
 
-# test
-```vendor/bin/phpunit tests```
-# todos
+Test
+------
+```bash 
+vendor/bin/phpunit tests
+```
+
+Todo
+------
 - 局域网API(基于swoole)
