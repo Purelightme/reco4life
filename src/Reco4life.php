@@ -36,7 +36,7 @@ class Reco4life
                 $options['headers'] = ['token' => $token];
             $response = $client->request('GET', $action, $options);
             $res = json_decode((string)$response->getBody(),true);
-            $res['result_desc'] = ErrorCode::RESULT_MSG[$res['result']];
+            $res['result_desc'] = isset($res['result']) ? ErrorCode::RESULT_MSG[$res['result']] : ErrorCode::RESULT_SUCCESS;
         } catch (GuzzleException $e) {
             $res['result_desc'] = '请求异常:'.$e->getMessage();
         }
